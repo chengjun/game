@@ -215,7 +215,6 @@
 
         <div class="btn-group">
             <button id="start-btn">Initialize System</button>
-            <button id="mission-btn" class="ai-btn">✨ Generate Mission</button>
         </div>
     </div>
 
@@ -227,94 +226,10 @@
 
         <div class="btn-group">
             <button id="restart-btn">Reboot System</button>
-            <button id="log-btn" class="ai-btn">✨ Analyze Flight Recorder</button>
         </div>
     </div>
 
 <script>
-/**
- * GEMINI AI INTEGRATION
- */
-const apiKey = ""; // Injected by environment
-
-async function callGemini(prompt) {
-    if (!apiKey) {
-        alert("API Key is missing! AI features unavailable.");
-        return "System Offline. Missing API Key.";
-    }
-
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            }
-        );
-
-        if (!response.ok) throw new Error("API Failure");
-
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error(error);
-        return "Communications Relay Offline. Cannot connect to Fleet Command.";
-    }
-}
-
-// Generate Mission Briefing
-document.getElementById('mission-btn').addEventListener('click', async function() {
-    const btn = this;
-    const output = document.getElementById('mission-briefing');
-    
-    btn.disabled = true;
-    btn.innerText = "Decrypting Signal...";
-    output.style.display = 'block';
-    output.innerText = "Establishing secure connection...";
-
-    const prompt = "Generate a short, intense, sci-fi mission briefing for an asteroid shooter game. The player is a lone pilot. Give the sector a cool name (e.g. Sector X-9). Explain why the asteroids are a threat (e.g. shielding a mining colony, blocking a trade route). Keep it under 50 words. Make it sound urgent.";
-    
-    const text = await callGemini(prompt);
-    
-    // Typing effect
-    output.innerText = "";
-    let i = 0;
-    const typeInterval = setInterval(() => {
-        output.innerText += text.charAt(i);
-        i++;
-        if (i >= text.length) clearInterval(typeInterval);
-    }, 20);
-
-    btn.innerText = "✨ Regenerate Mission";
-    btn.disabled = false;
-});
-
-// Generate Flight Log
-document.getElementById('log-btn').addEventListener('click', async function() {
-    const btn = this;
-    const output = document.getElementById('flight-log');
-    
-    btn.disabled = true;
-    btn.innerText = "Recovering Data...";
-    output.style.display = 'block';
-    output.innerText = "Scanning black box...";
-
-    const finalScore = document.getElementById('final-score').innerText;
-    let tone = "heroic";
-    if (parseInt(finalScore) < 500) tone = "disappointed and sarcastic";
-    
-    const prompt = `Write a short, dramatic flight recorder log entry for a spaceship pilot who just died. Final Score: ${finalScore}. Level Reached: ${level}. Tone: ${tone}. Keep it under 50 words. Format it like a log entry (Timestamp: ...).`;
-    
-    const text = await callGemini(prompt);
-    
-    output.innerText = text;
-    btn.innerText = "✨ Analyze Again";
-    btn.disabled = false;
-});
-
 
 /**
  * AUDIO SYSTEM
